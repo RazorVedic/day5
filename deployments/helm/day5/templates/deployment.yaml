@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "day5.labels" . | nindent 4 }}
   annotations:
-    janitor/ttl: "168h"
+    janitor/ttl: "71h"
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}

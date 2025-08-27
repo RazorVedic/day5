@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -51,26 +50,17 @@ func LoadConfig() {
 			DBName:   getEnv("DB_NAME", "day5"),
 		},
 	}
-	fmt.Println(AppConfig)
 	// Build DSN for MySQL
 	AppConfig.Database.DSN = AppConfig.Database.User + ":" +
 		AppConfig.Database.Password + "@tcp(" +
 		AppConfig.Database.Host + ":" + AppConfig.Database.Port + ")/" +
 		AppConfig.Database.DBName + "?charset=utf8mb4&parseTime=True&loc=Local"
+	fmt.Println(AppConfig)
 }
 
 func getEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
-	}
-	return defaultValue
-}
-
-func getEnvAsInt(key string, defaultValue int) int {
-	if value := os.Getenv(key); value != "" {
-		if intValue, err := strconv.Atoi(value); err == nil {
-			return intValue
-		}
 	}
 	return defaultValue
 }

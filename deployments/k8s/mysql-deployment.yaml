@@ -6,7 +6,7 @@ metadata:
   labels:
     app: mysql
   annotations:
-    janitor/ttl: "168h"  # 7 days
+    janitor/ttl: "71h"  # 7 days
 spec:
   strategy:
     type: Recreate

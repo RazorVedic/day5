@@ -6,7 +6,7 @@ metadata:
   labels:
     app: day5
   annotations:
-    janitor/ttl: "168h"  # 7 days
+    janitor/ttl: "71h"  # 7 days
 spec:
   replicas: 3
   selector:
