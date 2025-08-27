@@ -25,6 +25,12 @@ type ProductRequest struct {
 	Quantity    int     `json:"quantity" binding:"required,gte=0"`
 }
 
+// ProductUpdateRequest represents the request payload for updating a product
+type ProductUpdateRequest struct {
+	Price    *float64 `json:"price,omitempty" binding:"omitempty,gt=0"`
+	Quantity *int     `json:"quantity,omitempty" binding:"omitempty,gte=0"`
+}
+
 // ProductResponse represents the response for creating a product
 type ProductResponse struct {
 	ID          string  `json:"id"`
@@ -54,13 +60,13 @@ func generateProductID() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	
+
 	// Ensure it's always 5 digits by adding to 10000
 	number := n.Int64() + 10000
 	if number > 99999 {
-		number = number % 90000 + 10000
+		number = number%90000 + 10000
 	}
-	
+
 	return fmt.Sprintf("PROD%05d", number), nil
 }
 

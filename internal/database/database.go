@@ -57,6 +57,10 @@ func runMigrations() error {
 
 	err := DB.AutoMigrate(
 		&models.Product{},
+		&models.Customer{},
+		&models.Order{},
+		&models.Transaction{},
+		&models.CustomerCooldown{},
 	)
 
 	if err != nil {

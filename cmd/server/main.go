@@ -95,11 +95,27 @@ func setupAPIRoutes(router *gin.Engine) {
 
 	// Initialize handlers
 	productHandler := handlers.NewProductHandler()
+	customerHandler := handlers.NewCustomerHandler()
+	orderHandler := handlers.NewOrderHandler()
+	transactionHandler := handlers.NewTransactionHandler()
 
-	// Product routes
-	api.POST("/product", productHandler.CreateProduct)
+	// === PRODUCT ROUTES (For Retailer) ===
+	api.POST("/product", productHandler.CreateProduct)    // Add a product
+	api.PUT("/product/:id", productHandler.UpdateProduct) // Update product price/quantity
+	api.GET("/products", productHandler.GetProducts)      // View all products (also for customers)
+	api.GET("/product/:id", productHandler.GetProduct)    // Get single product
 
-	// Additional routes for testing (optional)
-	api.GET("/products", productHandler.GetProducts)
-	api.GET("/product/:id", productHandler.GetProduct)
+	// === CUSTOMER ROUTES ===
+	api.POST("/customer", customerHandler.CreateCustomer) // Register a customer
+	api.GET("/customers", customerHandler.GetCustomers)   // List all customers (for retailer)
+	api.GET("/customer/:id", customerHandler.GetCustomer) // Get single customer
+
+	// === ORDER ROUTES ===
+	api.POST("/order", orderHandler.PlaceOrder)                            // Customer places an order (with cooldown)
+	api.GET("/orders/customer/:customer_id", orderHandler.GetOrderHistory) // Customer views order history
+	api.GET("/orders", orderHandler.GetAllOrders)                          // Retailer views all orders
+
+	// === TRANSACTION ROUTES (For Retailer Business Analytics) ===
+	api.GET("/transactions", transactionHandler.GetTransactionHistory)     // Detailed transaction history
+	api.GET("/transactions/stats", transactionHandler.GetTransactionStats) // Business statistics dashboard
 }

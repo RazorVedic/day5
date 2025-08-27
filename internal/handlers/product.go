@@ -80,3 +80,48 @@ func (h *ProductHandler) GetProduct(c *gin.Context) {
 
 	c.JSON(http.StatusOK, product)
 }
+
+// UpdateProduct handles PUT /product/:id - for retailer to update price and quantity
+func (h *ProductHandler) UpdateProduct(c *gin.Context) {
+	id := c.Param("id")
+	var req models.ProductUpdateRequest
+
+	// Bind and validate request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request payload",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Find existing product
+	var product models.Product
+	if err := database.GetDB().First(&product, "id = ?", id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Product not found",
+		})
+		return
+	}
+
+	// Update fields if provided
+	if req.Price != nil {
+		product.Price = *req.Price
+	}
+	if req.Quantity != nil {
+		product.Quantity = *req.Quantity
+	}
+
+	// Save changes
+	if err := database.GetDB().Save(&product).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to update product",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Return success response
+	response := product.ToResponse("Product successfully updated")
+	c.JSON(http.StatusOK, response)
+}
