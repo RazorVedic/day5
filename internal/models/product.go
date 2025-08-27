@@ -43,7 +43,7 @@ type ProductResponse struct {
 // BeforeCreate hook to generate custom ID before creating record
 func (p *Product) BeforeCreate(tx *gorm.DB) error {
 	if p.ID == "" {
-		id, err := generateProductID()
+		id, err := GenerateProductID()
 		if err != nil {
 			return err
 		}
@@ -52,8 +52,8 @@ func (p *Product) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-// generateProductID generates a unique product ID in format PROD12345
-func generateProductID() (string, error) {
+// GenerateProductID generates a unique product ID in format PROD12345
+func GenerateProductID() (string, error) {
 	// Generate a random 5-digit number
 	max := big.NewInt(99999)
 	n, err := rand.Int(rand.Reader, max)

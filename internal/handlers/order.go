@@ -42,7 +42,8 @@ func (h *OrderHandler) PlaceOrder(c *gin.Context) {
 
 	// Check if customer exists
 	var customer models.Customer
-	if err := db.First(&customer, "id = ?", req.CustomerID).Error; err != nil {
+	if err := tx.First(&customer, "id = ?", req.CustomerID).Error; err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": fmt.Sprintf("Customer with ID %v not found", req.CustomerID),
 		})
@@ -51,11 +52,12 @@ func (h *OrderHandler) PlaceOrder(c *gin.Context) {
 
 	// Check cooldown period
 	var cooldown models.CustomerCooldown
-	err := db.Where("customer_id = ?", req.CustomerID).First(&cooldown).Error
+	err := tx.Where("customer_id = ?", req.CustomerID).First(&cooldown).Error
 	if err == nil {
 		// Cooldown record exists, check if enough time has passed
 		if !cooldown.CanPlaceOrder() {
 			remaining := cooldown.RemainingCooldown()
+			tx.Rollback()
 			c.JSON(http.StatusTooManyRequests, gin.H{
 				"error":                      "Customer is in cooldown period",
 				"cooldown_remaining_seconds": int(remaining.Seconds()),
@@ -64,6 +66,7 @@ func (h *OrderHandler) PlaceOrder(c *gin.Context) {
 			return
 		}
 	} else if err != gorm.ErrRecordNotFound {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to check cooldown",
 		})
@@ -72,7 +75,8 @@ func (h *OrderHandler) PlaceOrder(c *gin.Context) {
 
 	// Check if product exists and has sufficient quantity
 	var product models.Product
-	if err := db.First(&product, "id = ?", req.ProductID).Error; err != nil {
+	if err := tx.First(&product, "id = ?", req.ProductID).Error; err != nil {
+		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": fmt.Sprintf("Product with ID %v not found", req.ProductID),
 		})
@@ -80,6 +84,7 @@ func (h *OrderHandler) PlaceOrder(c *gin.Context) {
 	}
 
 	if product.Quantity < req.Quantity {
+		tx.Rollback()
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":              "Insufficient product quantity",
 			"available_quantity": product.Quantity,

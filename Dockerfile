@@ -5,7 +5,7 @@ FROM golang:1.21-alpine AS builder
 WORKDIR /app
 
 # Install git (needed for some Go modules)
-RUN apk add --no-cache git
+RUN apk add --no-cache git curl
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -21,6 +21,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/server/m
 
 # Production stage
 FROM alpine:latest
+
+RUN apk add --no-cache git curl
 
 # Install ca-certificates for HTTPS
 RUN apk --no-cache add ca-certificates tzdata
