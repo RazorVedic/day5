@@ -1,0 +1,455 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "gofoundationv2/v1/example/payment/service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "gofoundationv2.v1.example.payment.PaymentService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/payments": {
+      "get": {
+        "summary": "ListPayments to List all payments",
+        "operationId": "PaymentService_ListPayments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gofoundationv2.v1.example.payment.ListPaymentsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "reference_id",
+            "description": "reference_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "description": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "count",
+            "description": "count",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "gofoundationv2.v1.example.payment.PaymentService"
+        ]
+      },
+      "post": {
+        "summary": "CreatePayment to Create a new payment",
+        "operationId": "PaymentService_CreatePayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gofoundationv2.v1.example.payment.PaymentResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/gofoundationv2.v1.example.payment.CreatePaymentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "gofoundationv2.v1.example.payment.PaymentService"
+        ]
+      }
+    },
+    "/v1/payments/{id}": {
+      "get": {
+        "summary": "GetPayment to Get a payment by ID",
+        "operationId": "PaymentService_GetPayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gofoundationv2.v1.example.payment.PaymentResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id of the payment",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "gofoundationv2.v1.example.payment.PaymentService"
+        ]
+      },
+      "delete": {
+        "summary": "DeletePayment to Delete a payment by ID",
+        "operationId": "PaymentService_DeletePayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gofoundationv2.v1.example.payment.DeletePaymentResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id of the payment",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "gofoundationv2.v1.example.payment.PaymentService"
+        ]
+      },
+      "put": {
+        "summary": "UpdatePayment to Update an existing payment",
+        "operationId": "PaymentService_UpdatePayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/gofoundationv2.v1.example.payment.PaymentResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "id of the payment",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reference_id": {
+                  "type": "string",
+                  "title": "reference_id for the payment"
+                },
+                "amount": {
+                  "type": "string",
+                  "format": "int64",
+                  "title": "amount to be paid in the smallest unit of the currency (e.g., cents, paisa)"
+                },
+                "currency": {
+                  "type": "string",
+                  "title": "currency code (e.g., USD, INR)"
+                },
+                "description": {
+                  "type": "string",
+                  "title": "description of the payment"
+                },
+                "status": {
+                  "type": "string",
+                  "title": "status of the payment (e.g., created, approved, failed)"
+                },
+                "payer": {
+                  "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payer",
+                  "title": "payer details"
+                },
+                "payee": {
+                  "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payee",
+                  "title": "payee details"
+                }
+              },
+              "title": "UpdatePaymentRequest message for updating a payment"
+            }
+          }
+        ],
+        "tags": [
+          "gofoundationv2.v1.example.payment.PaymentService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "gofoundationv2.v1.Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "error code ..."
+        },
+        "message": {
+          "type": "string",
+          "description": "error message ..."
+        }
+      },
+      "description": "Error block that is used for all the APIs."
+    },
+    "gofoundationv2.v1.example.payment.CreatePaymentRequest": {
+      "type": "object",
+      "properties": {
+        "reference_id": {
+          "type": "string",
+          "title": "reference_id for the payment"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64",
+          "title": "amount to be paid in the smallest unit of the currency (e.g., cents, paisa)"
+        },
+        "currency": {
+          "type": "string",
+          "title": "currency code (e.g., USD, INR)"
+        },
+        "description": {
+          "type": "string",
+          "title": "description of the payment"
+        },
+        "payer": {
+          "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payer",
+          "title": "payer details"
+        },
+        "payee": {
+          "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payee",
+          "title": "payee details"
+        }
+      },
+      "title": "CreatePaymentRequest message for creating a payment"
+    },
+    "gofoundationv2.v1.example.payment.DeletePaymentResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id of the payment"
+        },
+        "error": {
+          "$ref": "#/definitions/gofoundationv2.v1.Error",
+          "title": "error block"
+        }
+      },
+      "title": "DeletePaymentResponse message for deleting a payment"
+    },
+    "gofoundationv2.v1.example.payment.Fundsource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id of the fundsource"
+        },
+        "account_number": {
+          "type": "string",
+          "title": "account_number of the fundsource"
+        },
+        "ifsc": {
+          "type": "string",
+          "title": "ifsc code of the fundsource"
+        }
+      },
+      "title": "Fundsource domain model"
+    },
+    "gofoundationv2.v1.example.payment.ListPaymentsResponse": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "type": "string",
+          "title": "entity i.e. collection"
+        },
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "title": "count is the number of payments (items)"
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payment"
+          },
+          "title": "payments has list of payments"
+        },
+        "error": {
+          "$ref": "#/definitions/gofoundationv2.v1.Error",
+          "title": "error block"
+        }
+      },
+      "title": "ListPaymentsResponse message for listing payments"
+    },
+    "gofoundationv2.v1.example.payment.Payee": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id of the payee"
+        },
+        "name": {
+          "type": "string",
+          "title": "name of the payee"
+        },
+        "vpa": {
+          "type": "string",
+          "title": "vpa (Virtual Payment Address) of the payee"
+        },
+        "fundsource": {
+          "$ref": "#/definitions/gofoundationv2.v1.example.payment.Fundsource",
+          "title": "fundsource details of the payee"
+        }
+      },
+      "title": "Payee domain model"
+    },
+    "gofoundationv2.v1.example.payment.Payer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id of the payer"
+        },
+        "name": {
+          "type": "string",
+          "title": "name of the payer"
+        },
+        "vpa": {
+          "type": "string",
+          "title": "vpa (Virtual Payment Address) of the payer"
+        },
+        "fundsource": {
+          "$ref": "#/definitions/gofoundationv2.v1.example.payment.Fundsource",
+          "title": "fundsource details of the payer"
+        }
+      },
+      "title": "Payer domain model"
+    },
+    "gofoundationv2.v1.example.payment.Payment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id of the payment"
+        },
+        "reference_id": {
+          "type": "string",
+          "title": "reference_id for the payment"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64",
+          "title": "amount to be paid in the smallest unit of the currency (e.g., cents, paisa)"
+        },
+        "currency": {
+          "type": "string",
+          "title": "currency code (e.g., USD, INR)"
+        },
+        "description": {
+          "type": "string",
+          "title": "description of the payment"
+        },
+        "status": {
+          "type": "string",
+          "title": "status of the payment (e.g., created, approved, failed)"
+        },
+        "payer": {
+          "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payer",
+          "title": "payer details"
+        },
+        "payee": {
+          "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payee",
+          "title": "payee details"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "created_at is the timestamp when the payment was created"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "updated_at is the timestamp when the payment was last updated"
+        },
+        "error": {
+          "$ref": "#/definitions/gofoundationv2.v1.Error",
+          "title": "error block"
+        }
+      },
+      "title": "Payment domain model"
+    },
+    "gofoundationv2.v1.example.payment.PaymentResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id of the payment"
+        },
+        "reference_id": {
+          "type": "string",
+          "title": "reference_id for the payment"
+        },
+        "amount": {
+          "type": "string",
+          "format": "int64",
+          "title": "amount to be paid in the smallest unit of the currency (e.g., cents, paisa)"
+        },
+        "currency": {
+          "type": "string",
+          "title": "currency code (e.g., USD, INR)"
+        },
+        "description": {
+          "type": "string",
+          "title": "description of the payment"
+        },
+        "status": {
+          "type": "string",
+          "title": "status of the payment (e.g., created, approved, failed)"
+        },
+        "payer": {
+          "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payer",
+          "title": "payer details"
+        },
+        "payee": {
+          "$ref": "#/definitions/gofoundationv2.v1.example.payment.Payee",
+          "title": "payee details"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "created_at is the Timestamp when the payment was created"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "int64",
+          "title": "updated_at is the Timestamp when the payment was last updated"
+        },
+        "error": {
+          "$ref": "#/definitions/gofoundationv2.v1.Error",
+          "title": "error block"
+        }
+      },
+      "title": "PaymentResponse message for payment operations"
+    }
+  }
+}

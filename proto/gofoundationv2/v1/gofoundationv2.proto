@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package gofoundationv2.v1;
+
+option go_package = "gofoundationv2;v1";
+
+// Error block that is used for all the APIs.
+message Error {
+    //  error code ...
+    string code = 1;
+    //  error message ...
+    string message = 2;
+}
+
+  

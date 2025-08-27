@@ -1,0 +1,115 @@
+services:
+  # PostgreSQL Database
+  # postgres:
+  #   image: harbor.razorpay.com/proxy_dockerhub/library/postgres:14-alpine3.20
+  #   container_name: go-foundation-postgres
+  #   environment:
+  #     POSTGRES_DB: payment
+  #     POSTGRES_USER: payment_user
+  #     POSTGRES_PASSWORD: payment_pass
+  #     POSTGRES_HOST_AUTH_METHOD: trust
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - db_data:/var/lib/postgresql/data
+  #   networks:
+  #     - go-foundation-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U payment_user -d payment"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # MySQL Database
+  mysql:
+    image: harbor.razorpay.com/proxy_dockerhub/bitnami/mysql:8.0
+    container_name: go-foundation-mysql
+    environment:
+      MYSQL_DATABASE: payment
+      MYSQL_USER: payment_user
+      MYSQL_PASSWORD: payment_pass
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - go-foundation-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "payment_user", "-ppayment_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Example Service
+  example:
+    build:
+      context: .
+      dockerfile: Dockerfile.compose
+      args:
+        - ARG_BIN=example
+        - ARG_OS=${OS:-linux}
+        - ARG_ARCH=${ARCH:-amd64}
+      secrets:
+        - git_token
+    container_name: go-foundation-example
+    ports:
+      - "8080:8080"  # HTTP
+      - "8081:8081"  # gRPC
+    environment:
+      - APP_ENV=default
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=payment
+      - DB_USER=payment_user
+      - DB_PASSWORD=payment_pass
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - go-foundation-network
+    volumes:
+      - ./config:/src/config:ro
+    restart: unless-stopped
+
+  # Example Migration Service
+  example_migration:
+    build:
+      context: .
+      dockerfile: Dockerfile.compose
+      args:
+        - ARG_BIN=example_migration
+        - ARG_OS=${OS:-linux}
+        - ARG_ARCH=${ARCH:-amd64}
+      secrets:
+        - git_token
+    container_name: go-foundation-migration
+    environment:
+      - APP_ENV=default
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=payment
+      - DB_USER=payment_user
+      - DB_PASSWORD=payment_pass
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - go-foundation-network
+    volumes:
+      - ./config:/src/config:ro
+    restart: "no"  # Run once and exit
+
+networks:
+  go-foundation-network:
+    driver: bridge
+    name: go-foundation-network
+
+volumes:
+  db_data:
+    driver: local
+    name: go-foundation-db-data
+
+secrets:
+  git_token:
+    environment: "TOKEN_GIT" 

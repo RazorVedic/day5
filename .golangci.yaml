@@ -1,0 +1,56 @@
+version: "2"
+linters:
+  default: none
+  enable:
+    - asciicheck
+    - errcheck
+    - forcetypeassert
+    - govet
+    - ineffassign
+    - lll
+    - misspell
+    - revive
+    - staticcheck
+    - unused
+  settings:
+    lll:
+      line-length: 80
+      tab-width: 1
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - path: (.+)\.go$
+        text: should have a package comment
+      - path: (.+)\.go$
+        text: 'unused-parameter: parameter ''ctx'''
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - goimports
+    - golines
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/razorpay)
+        - prefix(github.com/razorpay/go-foundation-v2)
+    golines:
+      max-len: 80
+      reformat-tags: false
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

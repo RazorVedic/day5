@@ -1,0 +1,26 @@
+FROM c.rzp.io/razorpay/rzp-docker-image-inventory-multi-arch:rzp-golden-image-base-golang-1.24-alpine3.21
+
+ARG ARG_OS
+ARG ARG_ARCH
+ARG ARG_BIN
+
+ENV WORKDIR=/src
+ENV HOME=/
+
+WORKDIR /src
+
+# Copy the configuration files
+COPY config /src/config
+
+# Copy migration files
+COPY internal/example/migrations /src/internal/example/migrations
+
+# Add the platform-specific binary.
+COPY bin/${ARG_OS}_${ARG_ARCH}/${ARG_BIN} /app
+
+# Create entrypoint script
+RUN echo '#!/bin/sh' > /entrypoint.sh && \
+    echo 'exec /app' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

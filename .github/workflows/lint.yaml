@@ -1,0 +1,92 @@
+name: lint
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  lint:
+    strategy:
+      matrix:
+        go-version-file: 'go.mod'
+        platform: [self-hosted]
+    runs-on:
+      - self-hosted
+      - non-api
+      - X64
+    env:
+      GOPRIVATE: github.com/razorpay
+      HOME: '/home/runner'
+    steps:
+      - uses: razorpay/create-github-app-token@v1
+        name: Generate Github Token
+        id: app-token
+        with:
+          app-id: ${{ secrets.WORKFLOWGATEKEEPER_APP_ID }}
+          private-key: ${{ secrets.WORKFLOWGATEKEEPER_PRIVATEKEY }}
+          repositories: 'goutils,upi-switch,go-foundation-v2,rpc'
+
+      - name: Login to Harbor
+        uses: docker/login-action@v2
+        with:
+          registry: c.rzp.io
+          username: ${{ secrets.HARBOR_DOCKER_USERNAME }}
+          password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Set Git for Private
+        env:
+          TOKEN: ${{ steps.app-token.outputs.token }}
+        run: git config --global url."https://x-access-token:${TOKEN}@github.com".insteadOf "https://github.com"
+      - uses: extractions/netrc@v1
+        with:
+          machine: github.com
+          username: rzp
+          password: ${{ steps.app-token.outputs.token }}
+      - name: format code
+        env:
+          TOKEN_GIT: ${{ steps.app-token.outputs.token }}
+        run: TOKEN_GIT=${TOKEN_GIT} make fmt
+      - name: lint code
+        env:
+          TOKEN_GIT: ${{ steps.app-token.outputs.token }}
+        run: TOKEN_GIT=${TOKEN_GIT} make lint
+  workflow_status:
+    runs-on:
+      - self-hosted
+      - non-api
+      - X64
+    name: Update Status Check
+    needs: [lint]
+    if: always()
+    steps:
+      - name: Failed
+        id: failed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo 'Failing the workflow for github status check.'
+          curl -X POST -H "Content-Type: application/json" -H "Authorization: token ${{ github.token }}" \
+          -d '{ "state" : "failure" , "context" : "github/combined-status-check" , "description" : "github/combined-status-check", "target_url" : "https://github.com/${{ github.repository }}" }' \
+          https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.pull_request.head.sha || github.sha }}
+          exit 1
+      - name: Success
+        if: steps.failed.conclusion == 'skipped'
+        run: |
+          echo 'Status check has passed!'
+          curl -X POST -H "Content-Type: application/json" -H "Authorization: token ${{ github.token }}" \
+          -d '{ "state" : "success" , "context" : "github/combined-status-check" , "description" : "github/combined-status-check", "target_url" : "https://github.com/${{ github.repository }}" }' \
+          https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.pull_request.head.sha || github.sha }}
+          exit 0
