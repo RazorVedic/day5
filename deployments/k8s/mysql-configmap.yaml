@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: day5
+data:
+  MYSQL_DATABASE: "day5"

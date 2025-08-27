@@ -1,0 +1,17 @@
+apiVersion: v2
+name: day5
+description: A Helm chart for day5 Go backend
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - go
+  - api
+  - backend
+  - product
+home: https://github.com/RazorVedic/day5
+sources:
+  - https://github.com/RazorVedic/day5
+maintainers:
+  - name: RazorVedic
+    email: vedic.v@razorpay.com

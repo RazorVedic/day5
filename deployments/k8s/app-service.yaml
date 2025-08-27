@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: day5
+  namespace: day5
+  labels:
+    app: day5
+    devstack_label: "day5-service"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: day5

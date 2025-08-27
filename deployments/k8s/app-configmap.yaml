@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: day5
+data:
+  SERVER_HOST: "0.0.0.0"
+  SERVER_PORT: "8080"
+  ENV: "production"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_USER: "root"
+  DB_NAME: "day5"
