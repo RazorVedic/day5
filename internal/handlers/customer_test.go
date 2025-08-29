@@ -38,7 +38,7 @@ func TestCreateCustomer(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		payload      interface{}
+		payload      any
 		expectedCode int
 		checkDB      bool
 	}{
@@ -171,12 +171,12 @@ func TestGetCustomers(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var response map[string]interface{}
+	var response map[string]any
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, float64(2), response["count"])
 
-	customers := response["customers"].([]interface{})
+	customers := response["customers"].([]any)
 	assert.Len(t, customers, 2)
 }
 

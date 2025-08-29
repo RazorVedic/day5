@@ -17,19 +17,19 @@ import (
 
 func setupProductTestRouter() (*gin.Engine, *gorm.DB) {
 	gin.SetMode(gin.TestMode)
-	
+
 	// Setup test environment
 	testutils.SetupTestConfig()
 	db := testutils.SetupTestDB(&testing.T{})
-	
+
 	router := gin.New()
 	handler := NewProductHandler()
-	
+
 	router.POST("/product", handler.CreateProduct)
 	router.GET("/products", handler.GetProducts)
 	router.GET("/product/:id", handler.GetProduct)
 	router.PUT("/product/:id", handler.UpdateProduct)
-	
+
 	return router, db
 }
 
@@ -39,7 +39,7 @@ func TestCreateProduct(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		payload      interface{}
+		payload      any
 		expectedCode int
 		checkDB      bool
 	}{
@@ -95,12 +95,12 @@ func TestCreateProduct(t *testing.T) {
 			jsonData, _ := json.Marshal(tt.payload)
 			req, _ := http.NewRequest("POST", "/product", bytes.NewBuffer(jsonData))
 			req.Header.Set("Content-Type", "application/json")
-			
+
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
-			
+
 			assert.Equal(t, tt.expectedCode, w.Code)
-			
+
 			if tt.checkDB && w.Code == http.StatusCreated {
 				var response models.ProductResponse
 				err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -108,7 +108,7 @@ func TestCreateProduct(t *testing.T) {
 				assert.NotEmpty(t, response.ID)
 				assert.Contains(t, response.ID, "PROD")
 				assert.Equal(t, "iPhone 15", response.ProductName)
-				
+
 				// Verify in database
 				var product models.Product
 				err = db.First(&product, "id = ?", response.ID).Error
@@ -133,12 +133,12 @@ func TestGetProducts(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var response map[string]interface{}
+	var response map[string]any
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, float64(2), response["count"])
-	
-	products := response["products"].([]interface{})
+
+	products := response["products"].([]any)
 	assert.Len(t, products, 2)
 }
 
@@ -195,7 +195,7 @@ func TestUpdateProduct(t *testing.T) {
 	tests := []struct {
 		name         string
 		productID    string
-		payload      interface{}
+		payload      any
 		expectedCode int
 		checkUpdate  bool
 	}{
@@ -252,12 +252,12 @@ func TestUpdateProduct(t *testing.T) {
 			jsonData, _ := json.Marshal(tt.payload)
 			req, _ := http.NewRequest("PUT", "/product/"+tt.productID, bytes.NewBuffer(jsonData))
 			req.Header.Set("Content-Type", "application/json")
-			
+
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
-			
+
 			assert.Equal(t, tt.expectedCode, w.Code)
-			
+
 			if tt.checkUpdate && w.Code == http.StatusOK {
 				var response models.ProductResponse
 				err := json.Unmarshal(w.Body.Bytes(), &response)

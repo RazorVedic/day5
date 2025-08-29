@@ -374,6 +374,44 @@ kubectl get svc -n day5
 kubectl port-forward -n day5 svc/day5-service 8080:80
 ```
 
+## 🏠 Local Kubernetes Setup
+
+For development and testing with local Kubernetes clusters:
+
+### Quick Start with Docker Desktop
+1. Enable Kubernetes in Docker Desktop Settings
+2. Build and deploy:
+```bash
+# Build the image
+make docker-build
+
+# Deploy with Helm
+helm upgrade --install day5 ./deployments/helm/day5 \
+  --namespace day5 \
+  --create-namespace \
+  --set image.pullPolicy=Never
+
+# Access the application
+kubectl port-forward service/day5-service 8080:80 -n day5
+```
+
+### Alternative Local Clusters
+- **Kind (Kubernetes in Docker)**: Lightweight, fast startup
+- **Minikube**: Full-featured local cluster
+- **k3d**: Rancher's lightweight alternative
+
+### Comprehensive Setup Guide
+For detailed instructions on setting up local Kubernetes clusters, loading images, and troubleshooting, see:
+
+📖 **[Local Kubernetes Setup Guide](docs/LOCAL_KUBERNETES_SETUP.md)**
+
+This guide covers:
+- Setting up Docker Desktop, Kind, or Minikube
+- Local image registry configuration
+- Deployment best practices
+- Monitoring and debugging
+- Troubleshooting common issues
+
 ## 🏗️ Key Business Features
 
 ### 1. Product Management

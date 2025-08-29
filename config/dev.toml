@@ -1,0 +1,67 @@
+# Development Configuration for Day5 Retailer API
+
+[app]
+name = "day5"
+version = "1.0.0"
+environment = "development"
+
+[server]
+host = "0.0.0.0"
+port = 8080
+timeout = 30
+read_timeout = 15
+write_timeout = 15
+
+[database]
+# Supported dialects: mysql, postgres, sqlite
+dialect = "mysql"
+host = "mysql"
+port = 3306
+username = "root"
+password = "pass"
+name = "day5"
+charset = "utf8mb4"
+parse_time = true
+loc = "Local"
+
+# Connection pool settings
+max_idle_conns = 10
+max_open_conns = 100
+conn_max_lifetime = 3600  # seconds
+
+# For SQLite (when dialect = "sqlite")
+sqlite_path = "./data/app.db"
+
+# For PostgreSQL (when dialect = "postgres")
+postgres_sslmode = "disable"
+postgres_timezone = "UTC"
+
+[logging]
+level = "debug"
+format = "json"
+output = "stdout"
+
+[business]
+# Customer cooldown period in minutes
+cooldown_period_minutes = 5
+
+# Currency settings
+default_currency = "INR"
+currency_precision = 2
+
+[security]
+# JWT settings (future use)
+jwt_secret = "1938712w93"
+jwt_expiry_hours = 24
+
+# Rate limiting
+rate_limit_requests = 100
+rate_limit_window_minutes = 1
+
+[cache]
+# Redis settings (future use)
+enabled = false
+host = "localhost"
+port = 6379
+password = ""
+db = 0

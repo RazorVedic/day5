@@ -30,7 +30,7 @@ help:
 build:
 	@echo "Building $(APP_NAME)..."
 	@mkdir -p bin
-	@CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/$(BINARY_NAME) $(MAIN_PATH)
+	@CGO_ENABLED=0 go build -a -installsuffix cgo -o bin/$(BINARY_NAME) $(MAIN_PATH)
 	@echo "Build completed: bin/$(BINARY_NAME)"
 
 # Clean build artifacts

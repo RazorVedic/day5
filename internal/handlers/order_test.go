@@ -43,7 +43,7 @@ func TestPlaceOrder(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		payload      interface{}
+		payload      any
 		expectedCode int
 		checkDB      bool
 	}{
@@ -180,7 +180,7 @@ func TestCooldownMechanism(t *testing.T) {
 	router.ServeHTTP(w2, req2)
 	assert.Equal(t, http.StatusTooManyRequests, w2.Code)
 
-	var errorResponse map[string]interface{}
+	var errorResponse map[string]any
 	err := json.Unmarshal(w2.Body.Bytes(), &errorResponse)
 	assert.NoError(t, err)
 	assert.Equal(t, "Customer is in cooldown period", errorResponse["error"])

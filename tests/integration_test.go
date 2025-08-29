@@ -96,14 +96,14 @@ func TestCompleteRetailerWorkflow(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var response map[string]interface{}
+		var response map[string]any
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.Equal(t, float64(3), response["count"])
 
-		products := response["products"].([]interface{})
+		products := response["products"].([]any)
 		for _, product := range products {
-			productMap := product.(map[string]interface{})
+			productMap := product.(map[string]any)
 			productIDs = append(productIDs, productMap["id"].(string))
 		}
 		assert.Len(t, productIDs, 3)
@@ -159,7 +159,7 @@ func TestCompleteRetailerWorkflow(t *testing.T) {
 
 		assert.Equal(t, http.StatusTooManyRequests, w.Code)
 
-		var response map[string]interface{}
+		var response map[string]any
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.Equal(t, "Customer is in cooldown period", response["error"])
@@ -221,13 +221,13 @@ func TestCompleteRetailerWorkflow(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var response map[string]interface{}
+		var response map[string]any
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 
 		// Verify stats structure
 		assert.Contains(t, response, "all_time")
-		allTime := response["all_time"].(map[string]interface{})
+		allTime := response["all_time"].(map[string]any)
 		assert.Greater(t, allTime["total_amount"], 0.0)
 		assert.Equal(t, 2.0, allTime["order_count"])
 	})
@@ -279,7 +279,7 @@ func TestErrorScenarios(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response map[string]interface{}
+		var response map[string]any
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.Contains(t, response["error"].(string), "Customer with ID CUST99999 not found")
@@ -303,7 +303,7 @@ func TestErrorScenarios(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response map[string]interface{}
+		var response map[string]any
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.Contains(t, response["error"].(string), "Product with ID PROD99999 not found")
@@ -357,7 +357,7 @@ func TestErrorScenarios(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response map[string]interface{}
+		var response map[string]any
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.Equal(t, "Insufficient product quantity", response["error"])

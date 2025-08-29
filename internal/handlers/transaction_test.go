@@ -212,7 +212,7 @@ func TestGetTransactionStats(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var response map[string]interface{}
+	var response map[string]any
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 
@@ -225,12 +225,12 @@ func TestGetTransactionStats(t *testing.T) {
 	assert.Contains(t, response, "stats_date")
 
 	// Check all_time stats (should have our test data)
-	allTime := response["all_time"].(map[string]interface{})
+	allTime := response["all_time"].(map[string]any)
 	assert.Greater(t, allTime["total_amount"], 0.0)
 	assert.Greater(t, allTime["order_count"], 0.0)
 
 	// Check top products
-	topProducts := response["top_products"].([]interface{})
+	topProducts := response["top_products"].([]any)
 	assert.GreaterOrEqual(t, len(topProducts), 0) // May be empty depending on query structure
 }
 
@@ -246,16 +246,16 @@ func TestGetTransactionStatsEmpty(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var response map[string]interface{}
+	var response map[string]any
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 
 	// Check that all stats are zero
-	allTime := response["all_time"].(map[string]interface{})
+	allTime := response["all_time"].(map[string]any)
 	assert.Equal(t, 0.0, allTime["total_amount"])
 	assert.Equal(t, 0.0, allTime["order_count"])
 
-	today := response["today"].(map[string]interface{})
+	today := response["today"].(map[string]any)
 	assert.Equal(t, 0.0, today["total_amount"])
 	assert.Equal(t, 0.0, today["order_count"])
 }
