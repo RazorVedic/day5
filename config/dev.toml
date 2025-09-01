@@ -15,7 +15,7 @@ write_timeout = 15
 [database]
 # Supported dialects: mysql, postgres, sqlite
 dialect = "mysql"
-host = "mysql"
+host = "localhost"
 port = 3306
 username = "root"
 password = "pass"

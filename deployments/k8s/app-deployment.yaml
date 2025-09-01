@@ -20,7 +20,7 @@ spec:
       containers:
       - name: day5
         image: day5:latest
-        imagePullPolicy: Always
+        imagePullPolicy: Never
         ports:
         - containerPort: 8080
         env:
@@ -39,31 +39,36 @@ spec:
             configMapKeyRef:
               name: app-config
               key: ENV
-        - name: DB_HOST
+        - name: DATABASE_DIALECT
           valueFrom:
             configMapKeyRef:
               name: app-config
-              key: DB_HOST
-        - name: DB_PORT
+              key: DATABASE_DIALECT
+        - name: DATABASE_HOST
           valueFrom:
             configMapKeyRef:
               name: app-config
-              key: DB_PORT
-        - name: DB_USER
+              key: DATABASE_HOST
+        - name: DATABASE_PORT
           valueFrom:
             configMapKeyRef:
               name: app-config
-              key: DB_USER
-        - name: DB_NAME
+              key: DATABASE_PORT
+        - name: DATABASE_USERNAME
           valueFrom:
             configMapKeyRef:
               name: app-config
-              key: DB_NAME
-        - name: DB_PASSWORD
+              key: DATABASE_USERNAME
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DATABASE_NAME
+        - name: DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
               name: mysql-secret
-              key: DB_PASSWORD
+              key: DATABASE_PASSWORD
         livenessProbe:
           httpGet:
             path: /health

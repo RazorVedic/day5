@@ -8,7 +8,7 @@ MAIN_PATH := cmd/server/main.go
 NAMESPACE := day5
 
 # Build targets
-.PHONY: build clean run test test-coverage test-handlers test-integration test-watch docker-build docker-run minikube-setup k8s-deploy k8s-clean helm-deploy helm-clean test-k8s dev-local dev-docker help
+.PHONY: build clean run test test-coverage test-handlers test-integration test-watch docker-build minikube-setup k8s-deploy k8s-clean helm-deploy helm-clean test-k8s dev-local dev-docker help
 
 # Default target
 help:
@@ -31,7 +31,6 @@ help:
 	@echo ""
 	@echo "Docker:"
 	@echo "  docker-build    - Build Docker image"
-	@echo "  docker-run      - Run with Docker Compose"
 	@echo ""
 	@echo "Kubernetes:"
 	@echo "  minikube-setup  - Setup and start Minikube cluster"
@@ -105,15 +104,11 @@ docker-build:
 	@docker build -t $(APP_NAME):$(VERSION) .
 	@echo "Docker image built: $(APP_NAME):$(VERSION)"
 
-# Run with Docker Compose
-docker-run:
-	@echo "Starting services with Docker Compose..."
-	@docker-compose up --build
 
 # Setup Minikube
 minikube-setup:
 	@echo "🚀 Setting up Minikube..."
-	@minikube start --memory=4096 --cpus=2 --driver=docker || echo "❌ Minikube start failed"
+	@minikube start --driver=docker || echo "❌ Minikube start failed"
 	@kubectl config set-context --current --namespace=$(NAMESPACE) || true
 	@echo "✅ Minikube setup completed"
 
@@ -177,6 +172,7 @@ dev-local:
 # Local development with Docker Compose
 dev-docker:
 	@echo "🐳 Starting local development with Docker Compose..."
+	@echo "📝 Using Docker Compose with MySQL database"
 	@docker-compose up --build
 
 # Test Kubernetes deployment end-to-end
