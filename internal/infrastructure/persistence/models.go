@@ -18,6 +18,8 @@ type Product struct {
 	CreatedAt   time.Time `gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `gorm:"autoUpdateTime"`
 
+
+
 	// Relationships
 	Orders       []Order       `gorm:"foreignKey:ProductID"`
 	Transactions []Transaction `gorm:"foreignKey:ProductID"`

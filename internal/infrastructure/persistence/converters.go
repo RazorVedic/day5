@@ -105,7 +105,7 @@ func ModelToOrder(model *Order, entity *entities.Order) {
 	entity.CreatedAt = model.CreatedAt
 	entity.UpdatedAt = model.UpdatedAt
 
-	// Convert related entities if present
+	// Related entities - load if present
 	if model.Customer.ID != "" {
 		entity.Customer = &entities.Customer{}
 		ModelToCustomer(&model.Customer, entity.Customer)
@@ -158,7 +158,7 @@ func ModelToTransaction(model *Transaction, entity *entities.Transaction) {
 	entity.TransactionAt = model.TransactionAt
 	entity.CreatedAt = model.CreatedAt
 
-	// Convert related entities if present
+	// Related entities - load if present
 	if model.Order.ID != "" {
 		entity.Order = &entities.Order{}
 		ModelToOrder(&model.Order, entity.Order)

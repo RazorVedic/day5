@@ -25,6 +25,7 @@ parse_time = true
 loc = "Local"
 
 # Connection pool settings
+
 max_idle_conns = 10
 max_open_conns = 100
 conn_max_lifetime = 3600  # seconds

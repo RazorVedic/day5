@@ -52,51 +52,51 @@ func (r *Router) setupAPIRoutes(router *gin.Engine) {
 	// === PRODUCT ROUTES (For Retailer) ===
 	productRoutes := api.Group("/product")
 	{
-		productRoutes.POST("", productHandler.CreateProduct)           // Create product
-		productRoutes.GET("/:id", productHandler.GetProduct)          // Get single product
-		productRoutes.PUT("/:id", productHandler.UpdateProduct)       // Update product
+		productRoutes.POST("", productHandler.CreateProduct)    // Create product
+		productRoutes.GET("/:id", productHandler.GetProduct)    // Get single product
+		productRoutes.PUT("/:id", productHandler.UpdateProduct) // Update product
 	}
-	
+
 	// Products collection routes
-	api.GET("/products", productHandler.GetProducts)                  // List all products
-	api.GET("/products/search", productHandler.SearchProducts)        // Search products
+	api.GET("/products", productHandler.GetProducts)                    // List all products
+	api.GET("/products/search", productHandler.SearchProducts)          // Search products
 	api.GET("/products/available", productHandler.GetAvailableProducts) // Available products
 
 	// === CUSTOMER ROUTES ===
 	customerRoutes := api.Group("/customer")
 	{
-		customerRoutes.POST("", customerHandler.CreateCustomer)        // Register customer
-		customerRoutes.GET("/:id", customerHandler.GetCustomer)       // Get single customer
+		customerRoutes.POST("", customerHandler.CreateCustomer)                // Register customer
+		customerRoutes.GET("/:id", customerHandler.GetCustomer)                // Get single customer
 		customerRoutes.GET("/:id/cooldown", customerHandler.GetCooldownStatus) // Cooldown status
 	}
-	
+
 	// Customers collection routes
-	api.GET("/customers", customerHandler.GetCustomers)               // List all customers
-	api.GET("/customers/search", customerHandler.SearchCustomers)     // Search customers
+	api.GET("/customers", customerHandler.GetCustomers)           // List all customers
+	api.GET("/customers/search", customerHandler.SearchCustomers) // Search customers
 
 	// === ORDER ROUTES ===
 	orderRoutes := api.Group("/order")
 	{
-		orderRoutes.POST("", orderHandler.PlaceOrder)                 // Place order
-		orderRoutes.GET("/:id", orderHandler.GetOrder)               // Get single order
+		orderRoutes.POST("", orderHandler.PlaceOrder)  // Place order
+		orderRoutes.GET("/:id", orderHandler.GetOrder) // Get single order
 	}
-	
+
 	// Orders collection routes
 	ordersRoutes := api.Group("/orders")
 	{
-		ordersRoutes.GET("", orderHandler.GetAllOrders)              // All orders (retailer)
-		ordersRoutes.GET("/today", orderHandler.GetTodaysOrders)     // Today's orders
+		ordersRoutes.GET("", orderHandler.GetAllOrders)                          // All orders (retailer)
+		ordersRoutes.GET("/today", orderHandler.GetTodaysOrders)                 // Today's orders
 		ordersRoutes.GET("/customer/:customer_id", orderHandler.GetOrderHistory) // Customer order history
 	}
 
 	// === TRANSACTION ROUTES (For Retailer Business Analytics) ===
 	transactionRoutes := api.Group("/transactions")
 	{
-		transactionRoutes.GET("", transactionHandler.GetTransactionHistory)     // Transaction history
-		transactionRoutes.GET("/stats", transactionHandler.GetTransactionStats) // Business stats
-		transactionRoutes.GET("/stats/comprehensive", transactionHandler.GetComprehensiveStats) // All periods
+		transactionRoutes.GET("", transactionHandler.GetTransactionHistory)                                       // Transaction history
+		transactionRoutes.GET("/stats", transactionHandler.GetTransactionStats)                                   // Business stats
+		transactionRoutes.GET("/stats/comprehensive", transactionHandler.GetComprehensiveStats)                   // All periods
 		transactionRoutes.GET("/customer/:customer_id/summary", transactionHandler.GetCustomerTransactionSummary) // Customer summary
-		transactionRoutes.GET("/revenue/analytics", transactionHandler.GetRevenueAnalytics) // Revenue analytics
+		transactionRoutes.GET("/revenue/analytics", transactionHandler.GetRevenueAnalytics)                       // Revenue analytics
 	}
 }
 
@@ -107,12 +107,5 @@ func (r *Router) healthCheck(c *gin.Context) {
 		"service":   "day5-retailer-api",
 		"version":   "2.0.0",
 		"timestamp": "2025-08-28T12:00:00Z",
-		"features": gin.H{
-			"clean_architecture":     true,
-			"dependency_injection":   true,
-			"multi_database_support": true,
-			"file_driven_config":     true,
-			"thread_safety":          true,
-		},
 	})
 }

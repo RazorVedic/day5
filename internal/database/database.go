@@ -76,10 +76,10 @@ func (d *DatabaseImpl) connect(cfg *config.DatabaseSettings) error {
 		return fmt.Errorf("unsupported database dialect: %s", cfg.Dialect)
 	}
 
-	// Configure GORM logger based on environment
+	// Configure GORM logger - use Silent for tests, Info for others
 	var gormLogger logger.Interface
-	if config.Config.App.IsProduction() {
-		gormLogger = logger.Default.LogMode(logger.Error)
+	if cfg.Dialect == "sqlite" && cfg.Name == ":memory:" {
+		gormLogger = logger.Default.LogMode(logger.Silent) // Silent for tests
 	} else {
 		gormLogger = logger.Default.LogMode(logger.Info)
 	}
@@ -158,9 +158,19 @@ func (d *DatabaseImpl) Migrate() error {
 		log.Printf("  - %s", modelType.Name())
 	}
 
+	// Disable foreign key constraints for SQLite during migration
+	if d.db.Dialector.Name() == "sqlite" {
+		d.db.Exec("PRAGMA foreign_keys = OFF")
+	}
+
 	err := d.db.AutoMigrate(modelsToMigrate...)
 	if err != nil {
 		return fmt.Errorf("migration failed: %w", err)
+	}
+
+	// Re-enable foreign key constraints for SQLite
+	if d.db.Dialector.Name() == "sqlite" {
+		d.db.Exec("PRAGMA foreign_keys = ON")
 	}
 
 	log.Println("Database migrations completed successfully")
