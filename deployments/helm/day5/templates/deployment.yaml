@@ -29,6 +29,18 @@ spec:
       serviceAccountName: default
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.35
+          command: ['sh', '-c']
+          args:
+          - |
+            echo "Waiting for MySQL to be ready..."
+            until nc -z mysql 3306; do
+              echo "MySQL not ready, waiting..."
+              sleep 2
+            done
+            echo "MySQL is ready!"
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

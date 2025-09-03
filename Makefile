@@ -51,12 +51,25 @@ build:
 	@CGO_ENABLED=0 go build -a -installsuffix cgo -o bin/$(BINARY_NAME) $(MAIN_PATH)
 	@echo "Build completed: bin/$(BINARY_NAME)"
 
-# Clean build artifacts
-clean:
-	@echo "Cleaning..."
-	@rm -rf bin/
-	@docker image prune -f
-	@echo "Clean completed"
+# Clean build artifacts  
+clean:    
+	@set -x    
+	@echo "Cleaning..."    
+	@rm -rf bin/    
+	@docker image prune -f    
+	@if lsof -i :8080 | awk 'NR>1 {print $$2}' | grep .; then \
+		echo "Processes running on port 8080:"; \
+		lsof -i :8080 | awk 'NR>1 {print "PID: "$$2}'; \
+		lsof -i :8080 | awk 'NR>1 {print $$2}' | while read -r pid; do \
+			echo "-----------------------------------------------"; \
+			echo "Details for PID: $$pid"; \
+			ps -p $$pid -o pid,ppid,user,tty,time,cmd; \
+			echo "Command to kill this process: kill $$pid"; \
+		done; \
+	else \
+		echo "No process is using port 8080."; \
+	fi    
+	@echo "Clean completed"  
 
 # Run the application
 run:
@@ -83,21 +96,6 @@ test-coverage:
 	@go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
-# Run specific test suites
-
-test-handlers:
-	@echo "Running HTTP handler tests..."
-	@go test -v ./internal/interfaces/http/...
-
-test-integration:
-	@echo "Running integration tests..."
-	@go test -v ./tests/...
-
-# Run tests in watch mode (requires entr)
-test-watch:
-	@echo "Running tests in watch mode..."
-	@find . -name "*.go" | entr -c make test
-
 # Build Docker image
 docker-build:
 	@echo "Building Docker image..."
@@ -114,6 +112,8 @@ minikube-setup:
 
 # Deploy to Kubernetes manually
 k8s-deploy:
+	@echo "Cleaning"
+	@make k8s-clean
 	@echo "📦 Deploying to Kubernetes..."
 	@kubectl create namespace $(NAMESPACE) || true
 	@kubectl config set-context --current --namespace=$(NAMESPACE)
@@ -123,23 +123,26 @@ k8s-deploy:
 	@kubectl apply -f deployments/k8s/mysql-deployment.yaml
 	@kubectl apply -f deployments/k8s/mysql-service.yaml
 	@echo "⏳ Waiting for MySQL to be ready..."
-	@kubectl wait --for=condition=ready pod -l app=mysql --timeout=120s
+	@./scripts/wait-for-pods.sh $(NAMESPACE) "app=mysql" 120
 	@kubectl apply -f deployments/k8s/app-configmap.yaml
 	@kubectl apply -f deployments/k8s/app-deployment.yaml
 	@kubectl apply -f deployments/k8s/app-service.yaml
 	@echo "⏳ Waiting for application to be ready..."
-	@kubectl wait --for=condition=ready pod -l app=$(APP_NAME) --timeout=120s
+	@./scripts/wait-for-pods.sh $(NAMESPACE) "app=$(APP_NAME)" 120
 	@echo "✅ Kubernetes deployment completed"
 	@echo "🔗 Run 'kubectl port-forward service/$(APP_NAME) 8080:80' to access the API"
 
 # Clean Kubernetes deployment
 k8s-clean:
+	@make clean
 	@echo "🧹 Cleaning Kubernetes deployment..."
 	@kubectl delete namespace $(NAMESPACE) || true
 	@echo "✅ Kubernetes cleanup completed"
 
 # Deploy with Helm
 helm-deploy:
+	@echo "Cleaning Helm"
+	@make helm-clean
 	@echo "⚙️  Deploying with Helm..."
 	@kubectl create namespace $(NAMESPACE) || true
 	@kubectl config set-context --current --namespace=$(NAMESPACE)
@@ -149,14 +152,22 @@ helm-deploy:
 		--create-namespace \
 		--set image.repository=$(APP_NAME) \
 		--set image.tag=$(VERSION) \
-		--set image.pullPolicy=Never
+		--set image.pullPolicy=Never \
+		--atomic \
+		--no-hooks
+		--wait --timeout 120s
+# @echo "⏳ Waiting for MySQL to be ready..."
+# @./scripts/wait-for-pods.sh $(NAMESPACE) "app=mysql" 120
+# @echo "⏳ Waiting for application to be ready..."
+# @./scripts/wait-for-pods.sh $(NAMESPACE) "app=$(APP_NAME)" 120
+
 	@echo "⏳ Waiting for deployment to be ready..."
-	@kubectl wait --for=condition=ready pod -l app=$(APP_NAME) --timeout=120s
 	@echo "✅ Helm deployment completed"
 	@echo "🔗 Run 'kubectl port-forward service/$(APP_NAME) 8080:80' to access the API"
 
 # Clean Helm deployment
 helm-clean:
+	@make clean
 	@echo "🧹 Cleaning Helm deployment..."
 	@helm uninstall $(APP_NAME) --namespace $(NAMESPACE) || true
 	@kubectl delete namespace $(NAMESPACE) || true

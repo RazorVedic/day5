@@ -3,7 +3,7 @@ replicaCount: 3
 
 image:
   repository: day5
-  pullPolicy: Always
+  pullPolicy: never
   tag: "latest"
 
 imagePullSecrets: []
@@ -11,7 +11,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 80
   targetPort: 8080
 
